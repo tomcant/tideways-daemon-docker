@@ -1,0 +1,21 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version:
+          - 1.5.76
+          - 1.6.6
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login -u tomcant --password-stdin
+          docker build --build-arg TIDEWAYS_VERSION=${{ matrix.version }} -t tomcant/tideways-daemon:${{ matrix.version }} .
+          docker push tomcant/tideways-daemon:${{ matrix.version }}
